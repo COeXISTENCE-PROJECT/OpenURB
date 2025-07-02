@@ -2,6 +2,7 @@ routerlurb==1.0.0
 matplotlib>=3.9.3
 numpy>=2.0.2
 pandas>=2.2.3
+polars==1.27.1
 tensordict==0.7.0
 torch>=2.6.0
 torchrl==0.7.0
