@@ -289,7 +289,7 @@ if __name__ == "__main__":
             observation, reward, termination, truncation, info = env.last()
             
             if termination or truncation:
-                agent_lookup[agent_id].model.push(-reward)
+                agent_lookup[agent_id].model.push(reward)
                 if episode % update_every == 0:
                     agent_lookup[agent_id].model.learn()
                 action = None
