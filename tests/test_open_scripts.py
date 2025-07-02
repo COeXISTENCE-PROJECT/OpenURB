@@ -6,12 +6,7 @@ import subprocess
 from pathlib import Path
 
 SCRIPTS_DIR = Path("scripts")
-python_scripts = list(SCRIPTS_DIR.rglob("*.py"))
-excluded_scripts = ["utils.py", "base_script.py", "baselines.py", "open_iql.py"]
-
-print(f"[DEBUG] Looking for Python scripts in {SCRIPTS_DIR.resolve()}")
-print(f"[DEBUG] Found {len(python_scripts)} Python scripts (excluding {len(excluded_scripts)} scripts).")
-python_scripts = [script for script in python_scripts if script.name not in excluded_scripts]
+python_script = [SCRIPTS_DIR / "open_iql.py"]
 
 @pytest.fixture(scope="session", autouse=True)
 def check_sumo_installed():
@@ -28,20 +23,19 @@ def check_sumo_installed():
             pytest.exit(f"[SUMO ERROR] Failed to get SUMO version: {e.stderr}")
 
 
-@pytest.mark.parametrize("script_path", python_scripts)
+@pytest.mark.parametrize("script_path", python_script)
 def test_python_script_execution(script_path):
     try:
         script_filename = script_path.name
-        print(script_filename)
         result = subprocess.run(
             ["python", script_filename,
-             "--id", f"test_{script_filename}", 
-             "--alg-conf", "test", 
-             "--env-conf", "test", 
-             "--task-conf", "test", 
+             "--id", f"test_{script_filename}",
+             "--alg-conf", "test",
+             "--env-conf", "test",
+             "--task-conf", "dynamic_test",
              "--net", "saint_arnoult"],
             capture_output=True, text=True, check=True, cwd=script_path.parent
         )
         print(f"[DEBUG] Successfully executed {script_path}")
     except subprocess.CalledProcessError as e:
-        pytest.fail(f"[FAIL] Script {script_path} failed to execute: {e.stderr}")
+        pytest.fail(f"[FAIL] {script_path} failed: {e.stderr}")

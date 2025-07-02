@@ -1,0 +1,18 @@
+{
+    "desc" : 
+    [
+        "Test config for dynamic exchanges"
+    ],
+
+    "ratio_machines" : 0.3,
+    "human_learning_episodes" : 5,
+    "test_eps" : 5,
+    "should_humans_adapt": true,
+    "av_behavior" : "selfish",
+    "human_model" : "gawron",
+
+    "dynamic_episodes" : 10,
+    "switch_interval" : 2,
+    "switch_prob_humans" : 0.005,
+    "switch_prob_machines" : 0.00001
+}
