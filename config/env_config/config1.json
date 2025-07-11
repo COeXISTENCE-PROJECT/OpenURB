@@ -4,7 +4,7 @@
     "save_every" : 5,
     "plot_every" : 50,
 
-    "observations" : "comprehensive",
+    "observations" : "trip_info_eta",
 
     "number_of_paths" : 4,
     "path_gen_beta" : -5,
