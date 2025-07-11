@@ -39,8 +39,8 @@ def test_python_script_execution(script_path):
              "--env-conf", "test",
              "--task-conf", "dynamic_test",
              "--net", "saint_arnoult",
-             "--env-seed", 0,
-             "--torch-seed", 0],
+             "--env-seed", "0",
+             "--torch-seed", "0"],
             capture_output=True, text=True, check=True, cwd=script_path.parent
         )
         print(f"[DEBUG] Successfully executed {script_path} for experiment {id1}")
