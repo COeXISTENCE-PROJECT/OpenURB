@@ -1,7 +1,9 @@
 """
-This script implements a simplified single-DQN algorithm for reinforcement learning in a traffic environment.
-The experiment involves dynamic switching between human and autonomous vehicle (AV) agents with predefined transition probabilities.
+his script implements a simplified single-DQN algorithm for reinforcement learning in a traffic environment.
+The experiment involves dynamic switching between human and autonomous vehicle (AV) agents with 
+switching probabilities conditioned on group travel times.
 """
+
 
 import os
 import sys
@@ -314,6 +316,8 @@ if __name__ == "__main__":
     ###############################################
     ######## AV learning + Switching phase ########
     ###############################################
+    human_tts = list()
+    av_tts = list()
     pbar.set_description("AV learning")
     for episode in range(training_eps + dynamic_episodes):
         env.reset()
@@ -329,6 +333,16 @@ if __name__ == "__main__":
                 action = agent_lookup[agent_id].model.act(observation)
                 
             env.step(action)
+            
+        if (episode > training_eps):
+            # Collect TTS for human and AV agents
+            travel_times = env.travel_times_list.copy()
+            ep_av_tt = [entry["travel_time"] for entry in travel_times if entry["kind"] == "AV"]
+            ep_human_tt = [entry["travel_time"] for entry in travel_times if entry["kind"] == "Human"]
+            if ep_av_tt:
+                av_tts.append(np.mean(ep_av_tt))
+            if ep_human_tt:
+                human_tts.append(np.mean(ep_human_tt))
            
         ################################## 
         ######## Dynamic switches ########
@@ -351,8 +365,14 @@ if __name__ == "__main__":
             
             known_machines = set(machine_agents_copy.keys())
             
+            tt_ratio = 1.0
+            if (len(human_tts) > 0) and (len(av_tts) > 0):
+                # If we have enough data, adjust the switch probability based on TTS
+                tt_ratio = np.mean(human_tts) / np.mean(av_tts)
+                
             for human in env.human_agents:
-                if random.random() <= switch_prob_humans:
+                cond_switch_prob_humans = switch_prob_humans * tt_ratio
+                if random.random() <= cond_switch_prob_humans:
                     env.human_agents.remove(human)
                     env.all_agents.remove(human)
                     
@@ -372,7 +392,8 @@ if __name__ == "__main__":
                     shifted_humans.append(str(human.id))
                       
             for machine in env.machine_agents:
-                if (machine.id not in shifted_humans) and (random.random() <= switch_prob_machines):
+                cond_switch_prob_machines = switch_prob_machines / tt_ratio
+                if (machine.id not in shifted_humans) and (random.random() <= cond_switch_prob_machines):
                     env.machine_agents.remove(machine)
                     env.all_agents.remove(machine)
                     
@@ -384,6 +405,9 @@ if __name__ == "__main__":
              
             env.all_agents = env.machine_agents + env.human_agents       
             env._initialize_machine_agents()
+            # Reset travel time tracks
+            human_tts = list()
+            av_tts = list()
             # Record switches
             shifted_humans = " ".join(shifted_humans) if shifted_humans else "None"
             shifted_avs = " ".join(shifted_avs) if shifted_avs else "None"
