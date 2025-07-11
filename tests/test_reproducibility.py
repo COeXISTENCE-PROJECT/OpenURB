@@ -27,18 +27,20 @@ def check_sumo_installed():
 
 @pytest.mark.parametrize("script_path", python_script)
 def test_python_script_execution(script_path):
+    script_filename = script_path.name
     id1 = f"test_{script_filename}1"
     id2 = f"test_{script_filename}2"
     
     try:
-        script_filename = script_path.name
         result = subprocess.run(
             ["python", script_filename,
              "--id", id1,
              "--alg-conf", "test",
              "--env-conf", "test",
              "--task-conf", "dynamic_test",
-             "--net", "saint_arnoult"],
+             "--net", "saint_arnoult",
+             "--env-seed", 0,
+             "--torch-seed", 0],
             capture_output=True, text=True, check=True, cwd=script_path.parent
         )
         print(f"[DEBUG] Successfully executed {script_path} for experiment {id1}")
@@ -47,14 +49,15 @@ def test_python_script_execution(script_path):
         
         
     try:
-        script_filename = script_path.name
         result = subprocess.run(
             ["python", script_filename,
              "--id", id2,
              "--alg-conf", "test",
              "--env-conf", "test",
              "--task-conf", "dynamic_test",
-             "--net", "saint_arnoult"],
+             "--net", "saint_arnoult",
+             "--env-seed", 0,
+             "--torch-seed", 0],
             capture_output=True, text=True, check=True, cwd=script_path.parent
         )
         print(f"[DEBUG] Successfully executed {script_path} for experiment {id2}")
