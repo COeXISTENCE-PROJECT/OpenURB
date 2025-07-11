@@ -4,6 +4,8 @@
     "save_every" : 5,
     "plot_every" : 50,
 
+    "observations" : "comprehensive",
+
     "number_of_paths" : 4,
     "path_gen_beta" : -5,
     "num_samples" : 10
