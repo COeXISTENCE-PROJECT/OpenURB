@@ -192,6 +192,9 @@ if __name__ == "__main__":
             content = f.read()
         with open(new_agents_csv_path, 'w', encoding='utf-8') as f:
             f.write(content)
+        max_start_time = pd.read_csv(new_agents_csv_path)['start_time'].max()
+    else:
+        raise FileNotFoundError(f"Agents CSV file not found at {agents_csv_path}. Please check the network folder.")
             
     num_machines = int(num_agents * ratio_machines)
     total_episodes = human_learning_episodes + training_eps + test_eps
@@ -226,7 +229,7 @@ if __name__ == "__main__":
             },
             "machine_parameters" : {
                 "behavior" : av_behavior,
-                "observation_type" : "previous_agents_plus_start_time"
+                "observation_type" : observations
             }
         },
         environment_parameters = {
@@ -235,7 +238,8 @@ if __name__ == "__main__":
         simulator_parameters = {
             "network_name" : network,
             "custom_network_folder" : custom_network_folder,
-            "sumo_type" : "sumo"
+            "sumo_type" : "sumo",
+            "simulation_timesteps" : max_start_time
         }, 
         plotter_parameters = {
             "phases" : phases,
@@ -270,10 +274,11 @@ if __name__ == "__main__":
     # Mutation
     env.mutation(disable_human_learning = not should_humans_adapt, mutation_start_percentile = -1)
     print_agent_counts(env)
+    obs_size = env.observation_space(env.possible_agents[0]).shape[0]
     
     # Set policies for machine agents
     for idx in range(len(env.machine_agents)):
-        env.machine_agents[idx].model = DQN(env.machine_agents[idx].action_space_size+1, env.machine_agents[idx].action_space_size, 
+        env.machine_agents[idx].model = DQN(obs_size, env.machine_agents[idx].action_space_size, 
                                             device=device, eps_init=eps_init, eps_decay=eps_decay,
                                             buffer_size=buffer_size, batch_size=batch_size, lr=lr, 
                                             num_epochs=num_epochs, num_hidden=num_hidden, widths=widths)
