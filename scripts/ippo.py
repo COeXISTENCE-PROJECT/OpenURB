@@ -278,10 +278,11 @@ if __name__ == "__main__":
     # Mutation
     env.mutation(disable_human_learning = not should_humans_adapt, mutation_start_percentile = -1)
     print_agent_counts(env)
+    obs_size = env.observation_space(env.possible_agents[0]).shape[0]
     
     # Set policies for machine agents
     for idx in range(len(env.machine_agents)):
-        env.machine_agents[idx].model = PPO(env.machine_agents[idx].action_space_size+1, env.machine_agents[idx].action_space_size, 
+        env.machine_agents[idx].model = PPO(obs_size, env.machine_agents[idx].action_space_size, 
                                             device=device, batch_size=batch_size, lr=lr, num_epochs=num_epochs,
                                             num_hidden=num_hidden, widths=widths, clip_eps=clip_eps,
                                             normalize_advantage=normalize_advantage, entropy_coef=entropy_coef)
