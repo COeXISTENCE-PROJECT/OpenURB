@@ -1,5 +1,5 @@
 """
-his script implements a simplified single-DQN algorithm for reinforcement learning in a traffic environment.
+This script implements a simplified single-DQN algorithm for reinforcement learning in a traffic environment.
 The experiment involves dynamic switching between human and autonomous vehicle (AV) agents with 
 switching probabilities conditioned on group travel times.
 """
@@ -192,8 +192,9 @@ if __name__ == "__main__":
     # To be used for tracking switches between groups
     shifts_path = os.path.join(records_folder, "shifts.csv")
     shifts_df = pl.DataFrame(
-        {col : list() for col in ["episode", "shifted_humans", "shifted_avs", "machine_ratio"]},
-        schema={"episode": pl.Int64, "shifted_humans": pl.String, "shifted_avs": pl.String, "machine_ratio": pl.Float64}
+        {col : list() for col in ["episode", "shifted_humans", "shifted_avs", "machine_ratio", "tt_ratio"]},
+        schema={"episode": pl.Int64, "shifted_humans": pl.String, "shifted_avs": pl.String, 
+                "machine_ratio": pl.Float64, "tt_ratio": pl.Float64}
         )
 
     # Read origin-destinations
@@ -414,7 +415,8 @@ if __name__ == "__main__":
             shifts_df.extend(
                 pl.DataFrame({
                 "episode": [episode], "shifted_humans": [shifted_humans],
-                "shifted_avs": [shifted_avs], "machine_ratio": [len(env.machine_agents) / len(env.all_agents)]
+                "shifted_avs": [shifted_avs], "machine_ratio": [len(env.machine_agents) / len(env.all_agents)],
+                "tt_ratio": [tt_ratio]
                 })
             )
             shifts_df.write_csv(shifts_path)
