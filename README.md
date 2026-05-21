@@ -14,10 +14,6 @@ OpenURB is a benchmark for learning route-choice policies in mixed-autonomy traf
 
 The benchmark is method-agnostic. Its purpose is to make experiments comparable across algorithms under the same route-choice task definitions, switching rules, and evaluation pipeline.
 
-## Local agent guidance
-
-If you are a coding agent working in this repo, read `AGENTS.md` and the local notes under `.agents/` before editing anything.
-
 ## Workflow
 
 Each experiment script follows the same high-level routine:
